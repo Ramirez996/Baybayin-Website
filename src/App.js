@@ -107,7 +107,7 @@ export default function App() {
       <section className="section alt">
   <h2>🎨 Design & Fashion</h2>
   <p>
-    Baybayin finds its place in t-shirts, tattoos, logos, and signage, symbolizing cultural pride.
+    Baybayin finds its place in t-shirts, bags, logos, tattoos and signage, symbolizing cultural pride.
   </p>
   <div className="gallery">
     <img src={tshirt} alt="Baybayin T-shirt" />
@@ -142,7 +142,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="footer">
-        <p>© 2025 Reviving Baybayin Project | Preserving Heritage Through Technology</p>
+        <p>© 2025 Reviving Baybayin Project | Preserving Heritage Through Technology | CSA5 Prelim Case Study Activity</p>
       </footer>
     </div>
   );  

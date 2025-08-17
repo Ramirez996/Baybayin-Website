@@ -86,7 +86,7 @@ export default function App() {
       {/* Hero Section */}
       <section className="hero">
         <h1 className="baybayin">ᜊᜌ᜔ᜊᜌᜒᜈ᜔</h1>
-        <h2>Reviving Baybayin in the Digital Age</h2>
+        <h2>Reviving Baybayin in the Digital Age of the Philippines</h2>
         <p>
           Preserving our cultural heritage through education, fashion, and government support.
         </p>

@@ -51,7 +51,7 @@ function AlphabetChart() {
 
   return (
     <div>
-      <h3>Baybayin Alphabet (A–Z)</h3>
+      <h3>Baybayin Alphabet from (A–Z) with latin equivalents and pronunciation per letter since Baybayin is a syllabic script, not a letter-based script. Each symbol usually represents a consonant + vowel (or a standalone vowel).</h3>
       <div className="alphabet-grid">
         {baybayinLetters.map((letter) => (
           <div
@@ -96,7 +96,7 @@ export default function App() {
       <section className="section">
         <h2>📚 Education</h2>
         <p>
-          Baybayin is being integrated into Araling Panlipunan subjects to strengthen cultural identity.
+          Baybayin is being integrated into Araling Panlipunan subject to strengthen cultural identity.
         </p>
         <div className="card">
           <AlphabetChart />

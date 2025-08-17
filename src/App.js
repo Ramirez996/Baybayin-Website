@@ -1,5 +1,8 @@
 import './App.css';
 import { useState } from 'react';
+import tshirt from './images/1.jpeg';
+import backpack from './images/2.jpeg';
+import wallet from './images/3.jpeg';
 
 function AlphabetChart() {
   const baybayinLetters = [
@@ -76,16 +79,16 @@ export default function App() {
 
       {/* Design & Fashion Section */}
       <section className="section alt">
-        <h2>🎨 Design & Fashion</h2>
-        <p>
-          Baybayin finds its place in t-shirts, tattoos, logos, and signage, symbolizing cultural pride.
-        </p>
-        <div className="grid">
-          <div className="card">T-shirt Designs</div>
-          <div className="card">Tattoos</div>
-          <div className="card">Logos & Signage</div>
-        </div>
-      </section>
+  <h2>🎨 Design & Fashion</h2>
+  <p>
+    Baybayin finds its place in t-shirts, tattoos, logos, and signage, symbolizing cultural pride.
+  </p>
+  <div className="gallery">
+    <img src={tshirt} alt="Baybayin T-shirt" />
+    <img src={backpack} alt="Baybayin Backpack" />
+    <img src={wallet} alt="Baybayin Wallets" />
+  </div>
+</section>
 
       {/* Government Efforts Section */}
       <section className="section">

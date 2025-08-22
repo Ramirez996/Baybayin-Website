@@ -18,7 +18,7 @@ export default function App() {
       <section className="hero">
         <h1 className="baybayin">ᜊᜌ᜔ᜊᜌᜒᜈ᜔</h1>
         <h2>Reviving Baybayin in the Digital Age</h2>
-        <p>Welcome, {user}! Preserving heritage through education, fashion, and governance.</p>
+        <p>Welcome, {user}! This is a website preserving Baybayin heritage through education, fashion, and governance.</p>
       </section>
 
       {/* Education Section */}
@@ -41,7 +41,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="footer">
-        <p>CSA5| © 2025 Reviving Baybayin Project | Preserving Heritage Through Technology</p>
+        <p>CSA5 | © 2025 Reviving Baybayin Project | Preserving Heritage Through Technology</p>
       </footer>
     </div>
   );

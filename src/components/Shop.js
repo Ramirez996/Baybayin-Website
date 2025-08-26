@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import tshirt from '../images/1.jpeg';
 import backpack from '../images/2.jpeg';
 import wallet from '../images/3.jpeg';
@@ -6,46 +5,29 @@ import slingbag1 from '../images/4.png';
 import slingbag2 from '../images/5.png';
 import slingbag3 from '../images/6.png';
 
-export default function Shop() {
-  const products = [
-    { id: 1, name: "Baybayin T-shirt", img: tshirt, price: 500 },
-    { id: 2, name: "Backpack", img: backpack, price: 1200 },
-    { id: 3, name: "Wallet", img: wallet, price: 400 },
-    { id: 4, name: "Sling Bag 1", img: slingbag1, price: 800 },
-    { id: 5, name: "Sling Bag 2", img: slingbag2, price: 850 },
-    { id: 6, name: "Sling Bag 3", img: slingbag3, price: 900 },
-  ];
+const products = [
+  { productID: 1, productName: "Baybayin T-shirt", productDescription: "A stylish t-shirt with Baybayin script.", img: tshirt, price: 500 },
+  { productID: 2, productName: "Backpack", productDescription: "Durable backpack with a Baybayin design.", img: backpack, price: 1200 },
+  { productID: 3, productName: "Wallet", productDescription: "Compact wallet featuring a Baybayin.", img: wallet, price: 400 },
+  { productID: 4, productName: "Sling Bag 1", productDescription: "A modern sling bag with a Baybayin pattern.", img: slingbag1, price: 800 },
+  { productID: 5, productName: "Sling Bag 2", productDescription: "A stylish sling bag with a Baybayin design.", img: slingbag2, price: 850 },
+  { productID: 6, name: "Sling Bag 3", productDescription: "A trendy sling bag featuring Baybayin.", img: slingbag3, price: 900 },
+];
 
-  const [cart, setCart] = useState([]);
-
-  const addToCart = (product) => {
-    setCart([...cart, product]);
-  };
-
-  const checkout = () => {
-    if (cart.length === 0) return alert("Cart is empty!");
-    alert("Proceeding to checkout...");
-  };
-
+export default function Shop({ onAddToCart }) {
   return (
-    <div>
-      <div className="gallery">
-        {products.map((p) => (
-          <div key={p.id}>
-            <img src={p.img} alt={p.name} />
-            <p>{p.name} - ₱{p.price}</p>
-            <button onClick={() => addToCart(p)}>Add to Cart</button>
+    <div className="shop-container">
+      <h3>🛍️ Our Products</h3>
+      <div className="product-grid">
+        {products.map((product) => (
+          <div key={product.productID} className="product-card">
+            <img src={product.img} alt={product.productName} className="product-image" />
+            <h4>{product.productName}</h4>
+            <p className="description">{product.productDescription}</p>
+            <p className="price">₱{product.price}</p>
+            <button onClick={() => onAddToCart(product)}>Add to Cart</button>
           </div>
         ))}
-      </div>
-      <div className="card">
-        <h3>Cart</h3>
-        {cart.length === 0 ? <p>No items yet.</p> : (
-          <ul>
-            {cart.map((item, idx) => <li key={idx}>{item.name} - ₱{item.price}</li>)}
-          </ul>
-        )}
-        <button onClick={checkout}>Checkout</button>
       </div>
     </div>
   );

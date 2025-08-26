@@ -63,7 +63,7 @@ export default function App() {
       {/* Homepage: displayMenu() */}
       <section className="hero">
         <h1 className="baybayin">ᜊᜌ᜔ᜊᜌᜒᜈ᜔</h1>
-        <h2>Reviving Baybayin in the Digital Age</h2>
+        <h2>Adhikaing Angaw: Baybaying, Kasaysayan, at Kalakalan</h2>
         <p>Welcome, {user.name}! This is a website preserving Baybayin heritage through education, fashion, and governance.</p>
       </section>
 

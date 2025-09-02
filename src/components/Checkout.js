@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import '../css/Checkout.css';
 
 export default function Checkout({ cart }) {
   const [address, setAddress] = useState("");

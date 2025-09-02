@@ -1,3 +1,5 @@
+import '../css/GovernmentBills.css';
+
 export default function GovernmentBills() {
   const bill = {
     billID: "S. No. 1866",
@@ -11,12 +13,12 @@ export default function GovernmentBills() {
   };
 
   return (
-    <div className="card">
+    <div className="bill-card">
       <h3>{bill.title}</h3>
       <p><strong>Bill ID:</strong> {bill.billID}</p>
       <p>
         <a href="https://legacy.senate.gov.ph/lisdata/4073037114!.pdf" target="_blank" rel="noreferrer">
-          Read Senate Bill PDF
+          Read full Senate Bill PDF
         </a>
       </p>
       <p>{bill.description}</p>

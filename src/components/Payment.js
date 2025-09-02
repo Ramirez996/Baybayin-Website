@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import '../css/PaymentOrder.css';
 
 export default function Payment({ totalAmount, onConfirmPayment }) {
   const [paymentMethod, setPaymentMethod] = useState('');

@@ -4,6 +4,7 @@ import wallet from '../images/3.jpeg';
 import slingbag1 from '../images/4.png';
 import slingbag2 from '../images/5.png';
 import slingbag3 from '../images/6.png';
+import '../css/ProductList.css';
 
 export default function ProductList({ onAddToCart }) {
   const products = [

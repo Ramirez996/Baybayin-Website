@@ -1,3 +1,5 @@
+import '../css/Cart.css';
+
 export default function Cart({ cartItems, onRemoveFromCart, onCheckout, calculateTotal }) {
   return (
     <div className="card">

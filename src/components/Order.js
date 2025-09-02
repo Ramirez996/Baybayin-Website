@@ -1,3 +1,5 @@
+import '../css/PaymentOrder.css';
+
 export default function Order({ order }) {
   return (
     <div className="card order-card">

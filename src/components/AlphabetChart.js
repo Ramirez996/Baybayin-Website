@@ -32,38 +32,29 @@ export default function AlphabetChart() {
 
   const [selected, setSelected] = useState(null);
 
-  // viewAlphabetKeys() method
-  const viewAlphabetKeys = () => {
-    return baybayinLetters.map((letter) => (
-      <div
-        key={letter.alphabetID}
-        className="letter-card"
-        onClick={() => setSelected(letter)}
-      >
-        {letter.symbol}
-      </div>
-    ));
-  };
-
-  // learnAlphabet() method (represented by the popup)
-  const learnAlphabet = () => {
-    return (
-      <div className="selected-letter">
-        <h4>{selected.symbol} — {selected.letter}</h4>
-        <p>{selected.pronunciation}</p>
-        <button className="close-btn" onClick={() => setSelected(null)}>✖ Close</button>
-      </div>
-    );
-  };
-
   return (
     <div>
       <h3>Baybayin Alphabet (A–Z)</h3>
       <div className="alphabet-grid">
-        {viewAlphabetKeys()}
+        {baybayinLetters.map((letter) => (
+          <div
+            key={letter.alphabetID}
+            className="letter-card"
+            onClick={() => setSelected(letter)}
+          >
+            {letter.symbol}
+          </div>
+        ))}
       </div>
 
-      {selected && learnAlphabet()}
+      {/* Conditionally render the pronunciation section */}
+      {selected && (
+        <div className="selected-letter">
+          <h4>{selected.symbol} — {selected.letter}</h4>
+          <p>{selected.pronunciation}</p>
+          <button className="close-btn" onClick={() => setSelected(null)}>✖ Close</button>
+        </div>
+      )}
     </div>
   );
 }

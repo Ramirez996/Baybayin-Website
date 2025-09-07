@@ -52,7 +52,7 @@ export default function LoginSignup({ onLogin }) {
 
   return (
     <div className="login-card">
-      <h3>{isSignup ? 'Sign Up' : 'Login'}</h3>
+      <h3>{isSignup ? 'Sign Up' : 'Welcome Back!'}</h3>
       <form onSubmit={isSignup ? handleSignup : handleLogin}>
         {isSignup && (
           <input
@@ -79,7 +79,7 @@ export default function LoginSignup({ onLogin }) {
       <p className="toggle-text">
         {isSignup ? 'Already have an account?' : 'Don’t have an account?'}
         <span className="toggle-link" onClick={() => setIsSignup(!isSignup)}>
-          {isSignup ? 'Login here' : 'Sign up here'}
+          {isSignup ? 'Login here' : ' Sign up here'}
         </span>
       </p>
     </div>

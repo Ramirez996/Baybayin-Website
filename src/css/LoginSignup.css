@@ -6,6 +6,7 @@
   margin: 50px auto;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   text-align: center;
+  animation: fadeIn 1.7s ease-in-out;
 }
 
 .login-card h3 {
@@ -42,7 +43,7 @@
   font-size: 1rem;
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+  transition: transform 0.3s ease-in-out, box-shadow 0.2s;
 }
 
 .login-card button:hover {

@@ -13,6 +13,33 @@ export default function App() {
   const [cartItems, setCartItems] = useState([]);
   const [currentOrder, setCurrentOrder] = useState(null);
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
+  const [appMessage, setAppMessage] = useState(null);
+  // State for logout loading status
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Helper component for message box (used only within this component)
+  const Message = ({ text, onClose, type }) => (
+    <div className={`custom-message-box ${type || 'success'}`}>
+      <div className="message-content">
+        <p>{text}</p>
+        <button onClick={onClose}>Dismiss</button>
+      </div>
+    </div>
+  );
+
+  // Logout Function with loading state
+  const handleLogout = () => {
+    setIsLoggingOut(true); // Start logging out animation
+    
+    setTimeout(() => { // Added delay for visual effect
+      setUser(null);
+      setCartItems([]);
+      setCurrentOrder(null);
+      setIsPaymentConfirmed(false);
+      setAppMessage("You have been successfully logged out.");
+      setIsLoggingOut(false); // End logging out
+    }, 800); // 800ms delay
+  };
 
   // Cart class methods
   const addToCart = (product) => {
@@ -50,31 +77,53 @@ export default function App() {
       status: 'Processing',
       deliveryAddress: paymentDetails.address
     }));
-    alert(`Payment of ₱${currentOrder.totalAmount.toFixed(2)} confirmed! Order ID: ${currentOrder.orderID}`);
+    setAppMessage(`Payment of ₱${currentOrder.totalAmount.toFixed(2)} confirmed! Order ID: ${currentOrder.orderID}`);
     setCartItems([]);
   };
 
   if (!user) {
-    return <LoginSignup onLogin={(user) => setUser(user)} />;
+    return (
+      <>
+        {appMessage && <Message text={appMessage} onClose={() => setAppMessage(null)} />}
+        <LoginSignup onLogin={(user) => setUser(user)} />
+      </>
+    );
   }
 
   return (
     <div className="app">
+      {appMessage && <Message text={appMessage} onClose={() => setAppMessage(null)} />}
+
+      {/* Logout button moved up, conditionally rendering spinner */}
+      <button 
+        className="logout-btn" 
+        onClick={handleLogout} 
+        disabled={isLoggingOut} // Disable while logging out
+      >
+        {isLoggingOut && <div className="loading-spinner"></div>}
+        <span className="button-text">
+            {isLoggingOut ? 'Logging Out' : 'Logout'}
+        </span>
+      </button>
+
       {/* Homepage: displayMenu() */}
       <section className="hero">
         <h1 className="baybayin">ᜊᜌ᜔ᜊᜌᜒᜈ᜔</h1>
         <h2>An Integrated Online System for Baybayin: Merchandising and Educational Initiatives</h2>
-        <p>Welcome, {user.name}! This is a website preserving Baybayin heritage through education, fashion, and governance.</p>
+        
+        <div className="user-info-container">
+            <p className="welcome-message">Welcome, {user.name}! This is a website preserving Baybayin heritage through education, fashion, and governance.</p>
+        </div>
       </section>
 
       <main>
         <section className="section">
-          <h2>📚 Education</h2>
+          <h2> Education</h2>
           <AlphabetChart />
         </section>
 
         <section className="section alt">
-          <h2>🎨 Design & Fashion</h2>
+          <h2> Design & Fashion</h2>
           <div className="shop-grid">
             <Shop onAddToCart={addToCart} />
             <Cart
@@ -88,7 +137,7 @@ export default function App() {
         
         {currentOrder && !isPaymentConfirmed && (
           <section className="section">
-            <h2>📦 Your Order</h2>
+            <h2> Your Order</h2>
             <Order order={currentOrder} />
             <Payment 
               totalAmount={currentOrder.totalAmount}
@@ -99,13 +148,13 @@ export default function App() {
         
         {isPaymentConfirmed && (
           <section className="section">
-            <h2>✅ Order Confirmed!</h2>
+            <h2> Order Confirmed!</h2>
             <p>Thank you for your purchase, {user.name}. Your order is now being processed.</p>
           </section>
         )}
 
         <section className="section">
-          <h2>🏛️ Government Efforts</h2>
+          <h2> Government Efforts</h2>
           <GovernmentBills />
         </section>
       </main>

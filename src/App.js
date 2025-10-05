@@ -14,10 +14,13 @@ export default function App() {
   const [currentOrder, setCurrentOrder] = useState(null);
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
   const [appMessage, setAppMessage] = useState(null);
-  // State for logout loading status
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
+  const [isCartVisible, setIsCartVisible] = useState(false); // ✅ controls cart view
+  const [showModal, setShowModal] = useState(false); // ✅ new: modal visibility
 
-  // Helper component for message box (used only within this component)
+  // === Message Component ===
   const Message = ({ text, onClose, type }) => (
     <div className={`custom-message-box ${type || 'success'}`}>
       <div className="message-content">
@@ -27,34 +30,48 @@ export default function App() {
     </div>
   );
 
-  // Logout Function with loading state
+  // === Modal Component ===
+  const Modal = ({ title, children, onClose }) => (
+    <div className="modal-overlay">
+      <div className="modal-box">
+        <h3>{title}</h3>
+        <div className="modal-content">{children}</div>
+        <button className="modal-close-btn" onClick={onClose}>Close</button>
+      </div>
+    </div>
+  );
+
+  // === Logout ===
   const handleLogout = () => {
-    setIsLoggingOut(true); // Start logging out animation
-    
-    setTimeout(() => { // Added delay for visual effect
+    setIsLoggingOut(true);
+    setTimeout(() => {
       setUser(null);
       setCartItems([]);
       setCurrentOrder(null);
       setIsPaymentConfirmed(false);
-      setAppMessage("You have been successfully logged out.");
-      setIsLoggingOut(false); // End logging out
-    }, 800); // 800ms delay
+      setAppMessage("You have been logged out successfully.");
+      setIsLoggingOut(false);
+    }, 800);
   };
 
-  // Cart class methods
+  // === Cart Methods ===
   const addToCart = (product) => {
-    setCartItems(prevItems => [...prevItems, { ...product, cartItemID: Date.now() + Math.random() }]);
+    setCartItems(prevItems => [
+      ...prevItems,
+      { ...product, cartItemID: Date.now() + Math.random() }
+    ]);
   };
 
   const removeFromCart = (productToRemove) => {
-    setCartItems(prevItems => prevItems.filter(item => item.cartItemID !== productToRemove.cartItemID));
+    setCartItems(prevItems =>
+      prevItems.filter(item => item.cartItemID !== productToRemove.cartItemID)
+    );
   };
 
   const calculateTotal = () => {
     return cartItems.reduce((sum, item) => sum + item.price, 0);
   };
 
-  // Order class method: checkout()
   const handleCheckout = () => {
     if (cartItems.length > 0) {
       const newOrder = {
@@ -62,102 +79,146 @@ export default function App() {
         orderDate: new Date(),
         totalAmount: calculateTotal(),
         status: 'Pending',
-        deliveryAddress: '', // This will be set in the Payment component
+        deliveryAddress: '',
       };
       setCurrentOrder(newOrder);
       setIsPaymentConfirmed(false);
     }
   };
 
-  // Payment class method: confirmPayment()
   const handleConfirmPayment = (paymentDetails) => {
     setIsPaymentConfirmed(true);
-    setCurrentOrder(prevOrder => ({ 
-      ...prevOrder, 
+    setCurrentOrder(prevOrder => ({
+      ...prevOrder,
       status: 'Processing',
       deliveryAddress: paymentDetails.address
     }));
-    setAppMessage(`Payment of ₱${currentOrder.totalAmount.toFixed(2)} confirmed! Order ID: ${currentOrder.orderID}`);
     setCartItems([]);
+    setIsCartVisible(false);
+    setShowModal(true); // ✅ show modal after payment confirmed
   };
 
+  // === Login Page ===
   if (!user) {
     return (
-      <>
+      <div className="app">
         {appMessage && <Message text={appMessage} onClose={() => setAppMessage(null)} />}
-        <LoginSignup onLogin={(user) => setUser(user)} />
-      </>
+        <LoginSignup onLogin={(userData) => setUser(userData)} />
+      </div>
     );
   }
 
+  // === Main App Layout ===
   return (
     <div className="app">
       {appMessage && <Message text={appMessage} onClose={() => setAppMessage(null)} />}
 
-      {/* Logout button moved up, conditionally rendering spinner */}
-      <button 
-        className="logout-btn" 
-        onClick={handleLogout} 
-        disabled={isLoggingOut} // Disable while logging out
+      {/* === Dropdown Menu === */}
+      <div className="dropdown-container">
+        <button className="menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          ☰ Menu
+        </button>
+
+        {isMenuOpen && (
+          <div className="dropdown-menu">
+            <button onClick={() => setActiveSection(null)}>🏠 Home</button>
+            <button onClick={() => setActiveSection('education')}>📖 Education</button>
+            <button onClick={() => setActiveSection('fashion')}>🛍️ Design & Fashion</button>
+            <button onClick={() => setActiveSection('government')}>🏛️ Government</button>
+          </div>
+        )}
+      </div>
+
+      {/* === Logout Button === */}
+      <button
+        className="logout-btn"
+        onClick={handleLogout}
+        disabled={isLoggingOut}
       >
         {isLoggingOut && <div className="loading-spinner"></div>}
         <span className="button-text">
-            {isLoggingOut ? 'Logging Out' : 'Logout'}
+          {isLoggingOut ? 'Logging out...' : 'Logout'}
         </span>
       </button>
 
-      {/* Homepage: displayMenu() */}
+      {/* === Hero Section === */}
       <section className="hero">
         <h1 className="baybayin">ᜊᜌ᜔ᜊᜌᜒᜈ᜔</h1>
         <h2>An Integrated Online System for Baybayin: Merchandising and Educational Initiatives</h2>
-        
         <div className="user-info-container">
-            <p className="welcome-message">Welcome, {user.name}! This is a website preserving Baybayin heritage through education, fashion, and governance.</p>
+          <p className="welcome-message">
+            Welcome, {user.name}! This website preserves Baybayin heritage through education, fashion, and governance.
+          </p>
         </div>
       </section>
 
+      {/* === Conditional Sections === */}
       <main>
-        <section className="section">
-          <h2> Education</h2>
-          <AlphabetChart />
-        </section>
-
-        <section className="section alt">
-          <h2> Design & Fashion</h2>
-          <div className="shop-grid">
-            <Shop onAddToCart={addToCart} />
-            <Cart
-              cartItems={cartItems}
-              onRemoveFromCart={removeFromCart}
-              onCheckout={handleCheckout}
-              calculateTotal={calculateTotal}
-            />
-          </div>
-        </section>
-        
-        {currentOrder && !isPaymentConfirmed && (
+        {activeSection === 'education' && (
           <section className="section">
-            <h2> Your Order</h2>
-            <Order order={currentOrder} />
-            <Payment 
-              totalAmount={currentOrder.totalAmount}
-              onConfirmPayment={handleConfirmPayment}
-            />
-          </section>
-        )}
-        
-        {isPaymentConfirmed && (
-          <section className="section">
-            <h2> Order Confirmed!</h2>
-            <p>Thank you for your purchase, {user.name}. Your order is now being processed.</p>
+            <h2>Education</h2>
+            <AlphabetChart />
           </section>
         )}
 
-        <section className="section">
-          <h2> Government Efforts</h2>
-          <GovernmentBills />
-        </section>
+        {activeSection === 'fashion' && (
+          <section className="section alt">
+            <h2>Design & Fashion</h2>
+
+            {/* 🛒 View Cart Button */}
+            <button
+              className="view-cart-btn"
+              onClick={() => setIsCartVisible(!isCartVisible)}
+            >
+              🛒 {isCartVisible ? 'Back to Products' : `View Cart (${cartItems.length})`}
+            </button>
+
+            {/* ✅ Toggle between products and cart */}
+            {!isCartVisible ? (
+              <div className="shop-grid">
+                <Shop onAddToCart={addToCart} />
+              </div>
+            ) : (
+              <Cart
+                cartItems={cartItems}
+                onRemoveFromCart={removeFromCart}
+                onCheckout={handleCheckout}
+                calculateTotal={calculateTotal}
+              />
+            )}
+
+            {/* === Order & Payment Handling === */}
+            {currentOrder && !isPaymentConfirmed && (
+              <div>
+                <Order order={currentOrder} />
+                <Payment
+                  totalAmount={currentOrder.totalAmount}
+                  onConfirmPayment={handleConfirmPayment}
+                />
+              </div>
+            )}
+          </section>
+        )}
+
+        {activeSection === 'government' && (
+          <section className="section">
+            <h2>Government Efforts</h2>
+            <GovernmentBills />
+          </section>
+        )}
       </main>
+
+      {/* ✅ Modal for Order Confirmation */}
+      {showModal && (
+        <Modal
+          title="Order Confirmed!"
+          onClose={() => setShowModal(false)}
+        >
+          <p>Thank you for your purchase, {user.name}. Your order is now being processed.</p>
+          <p><strong>Order ID:</strong> {currentOrder?.orderID}</p>
+          <p><strong>Total Paid:</strong> ₱{currentOrder?.totalAmount.toFixed(2)}</p>
+        </Modal>
+      )}
 
       <footer className="footer">
         <p>CSA5 | © 2025 Reviving Baybayin Project | Preserving Heritage Through Technology</p>

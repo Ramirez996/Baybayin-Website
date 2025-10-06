@@ -7,6 +7,10 @@ import GovernmentBills from './components/GovernmentBills';
 import Cart from './components/Cart';
 import Order from './components/Order';
 import Payment from './components/Payment';
+import facebookIcon from './images/facebook.png';
+import instagramIcon from './images/instagram.png';
+import twitterIcon from './images/X.png';
+
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -223,6 +227,38 @@ export default function App() {
       <footer className="footer">
         <p>CSA5 | © 2025 Reviving Baybayin Project | Preserving Heritage Through Technology</p>
       </footer>
+{/* === Floating Social Links === */}
+<div className="floating-socials">
+  <a
+    href="https://www.facebook.com/YourPageHere"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="social-btn"
+    title="Follow us on Facebook"
+  >
+    <img src={facebookIcon} alt="Facebook" className="social-icon" />
+  </a>
+
+  <a
+    href="https://www.instagram.com/YourPageHere"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="social-btn"
+    title="Follow us on Instagram"
+  >
+    <img src={instagramIcon} alt="Instagram" className="social-icon" />
+  </a>
+
+  <a
+    href="https://x.com/YourPageHere"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="social-btn"
+    title="Follow us on X"
+  >
+    <img src={twitterIcon} alt="X" className="social-icon" />
+  </a>
+</div>
     </div>
   );
 }

@@ -859,3 +859,88 @@ main {
   font-size: 2rem;
   color: #4b3f2f;
 }
+
+.footer {
+  background-color: #111;
+  color: #fff;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  margin-top: 3rem;
+  border-top: 2px solid #333;
+}
+
+.footer p {
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.social-icon {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  transition: transform 0.2s, color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.social-icon:hover {
+  transform: scale(1.1);
+}
+
+.social-icon.facebook:hover {
+  color: #1877f2;
+}
+
+.social-icon.instagram:hover {
+  color: #e4405f;
+}
+
+.social-icon.twitter:hover {
+  color: #1da1f2;
+}
+/* === Floating Social Buttons === */
+/* === Floating Social Buttons === */
+.floating-socials {
+  position: fixed;
+  bottom: 20px;
+  right: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.social-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.social-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.social-icon {
+  width: 90%;
+  height: 90%;
+  object-fit: cover;
+  border-radius: 50%;
+  transform: scale(1.2); /* zoom in slightly to remove white edges */
+}
+

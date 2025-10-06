@@ -1,69 +1,269 @@
 import { useState } from 'react';
-import baybayinImage from '../images/baybayinLetter.png'; // Make sure this path is correct
-import kapanganakanImage from '../images/Kapanganakan.png'; 
-import kasalImage from '../images/Kasal.png'; 
-import kamatayanImage from '../images/Kamatayan.png'; 
+import { motion, AnimatePresence } from 'framer-motion';
+import baybayinImage from '../images/baybayinLetter.png';
+import kapanganakanImage from '../images/Kapanganakan.png';
+import kasalImage from '../images/Kasal.png';
+import kamatayanImage from '../images/Kamatayan.png';
 import letterImage from '../images/letter.png';
+import kudlitImage from '../images/Kudlit.png';
+import pamudpodImage from '../images/Pamudpod.png';
+import modernRevivalImage from '../images/ModernRevival.png';
 
 export default function AlphabetChart() {
-  const baybayinLetters = [
-    // ... (your existing baybayinLetters array) ...
-    { alphabetID: 1, letter: "A", symbol: "ᜀ", pronunciation: "Vowel A" },
-    { alphabetID: 2, letter: "B", symbol: "ᜊ", pronunciation: "BA" },
-    { alphabetID: 3, letter: "C", symbol: "ᜃ", pronunciation: "KA" },
-    { alphabetID: 4, letter: "D", symbol: "ᜇ", pronunciation: "DA / RA" },
-    { alphabetID: 5, letter: "E", symbol: "ᜁ", pronunciation: "Vowel I/E" },
-    { alphabetID: 6, letter: "F", symbol: "ᜉ", pronunciation: "PA" },
-    { alphabetID: 7, letter: "G", symbol: "ᜄ", pronunciation: "GA" },
-    { alphabetID: 8, letter: "H", symbol: "ᜑ", pronunciation: "HA" },
-    { alphabetID: 9, letter: "I", symbol: "ᜁ", pronunciation: "Vowel I" },
-    { alphabetID: 10, letter: "J", symbol: "ᜇ", pronunciation: "DA/RA" },
-    { alphabetID: 11, letter: "K", symbol: "ᜃ", pronunciation: "KA" },
-    { alphabetID: 12, letter: "L", symbol: "ᜎ", pronunciation: "LA" },
-    { alphabetID: 13, letter: "M", symbol: "ᜋ", pronunciation: "MA" },
-    { alphabetID: 14, letter: "N", symbol: "ᜈ", pronunciation: "NA" },
-    { alphabetID: 15, letter: "O", symbol: "ᜂ", pronunciation: "Vowel O/U" },
-    { alphabetID: 16, letter: "P", symbol: "ᜉ", pronunciation: "PA" },
-    { alphabetID: 17, letter: "Q", symbol: "ᜃ", pronunciation: "KA" },
-    { alphabetID: 18, letter: "R", symbol: "ᜇ", pronunciation: "RA" },
-    { alphabetID: 19, letter: "S", symbol: "ᜐ", pronunciation: "SA" },
-    { alphabetID: 20, letter: "T", symbol: "ᜆ", pronunciation: "TA" },
-    { alphabetID: 21, letter: "U", symbol: "ᜂ", pronunciation: "Vowel U/O" },
-    { alphabetID: 22, letter: "V", symbol: "ᜊ", pronunciation: "BA" },
-    { alphabetID: 23, letter: "W", symbol: "ᜏ", pronunciation: "WA" },
-    { alphabetID: 24, letter: "X", symbol: "ᜐ", pronunciation: "SA" },
-    { alphabetID: 25, letter: "Y", symbol: "ᜌ", pronunciation: "YA" },
-    { alphabetID: 26, letter: "Z", symbol: "ᜐ", pronunciation: "SA" },
+  // === States ===
+  const [showHistory, setShowHistory] = useState(false);
+  const [showFullHistory, setShowFullHistory] = useState(false);
+  const [activeCard, setActiveCard] = useState(null);
+  const [showTrivia, setShowTrivia] = useState(false);
+  const [score, setScore] = useState(0);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [quizFinished, setQuizFinished] = useState(false);
+
+  // === Handlers ===
+  const toggleHistory = () => setShowHistory(!showHistory);
+  const toggleFullHistory = () => setShowFullHistory(!showFullHistory);
+  const [showPractice, setShowPractice] = useState(false);
+  const [practiceInput, setPracticeInput] = useState("");
+  const togglePractice = () => setShowPractice(!showPractice);
+
+  const trivia = [
+       { q: "What does the word 'Baybayin' mean?", a: ["To write", "To spell", "To speak", "To draw"], correct: "To spell" },
+    { q: "What type of writing system is Baybayin?", a: ["Alphabet", "Syllabary", "Abugida", "Abjad"], correct: "Abugida" },
+    { q: "Which mark changes the vowel sound in Baybayin?", a: ["Kudlit", "Pamudpod", "Krus", "Ekis"], correct: "Kudlit" },
+    { q: "What is used to remove the vowel 'a' sound in Baybayin?", a: ["Pamudpod", "Kudlit", "Bituin", "Tambal"], correct: "Pamudpod" },
+    { q: "Which ancient script influenced Baybayin?", a: ["Kawi", "Greek", "Arabic", "Latin"], correct: "Kawi" },
+    { q: "Which ancient script influenced Baybayin?", a: ["Kawi", "Greek", "Arabic", "Latin"], correct: "Kawi" },
+    { q: "Which book was published in Baybayin in 1593?", a: ["Noli Me Tangere", "Doctrina Christiana", "Florante at Laura", "El Filibusterismo"], correct: "Doctrina Christiana" },
+    { q: "What kind of symbols does Baybayin use?", a: ["Syllables", "Letters", "Numbers", "Pictures"], correct: "Syllables" },
+    { q: "What does the Kudlit mark do?", a: ["Changes vowel", "Removes vowel", "Adds consonant", "Makes pause"], correct: "Changes vowel" },
   ];
 
-  const [selected, setSelected] = useState(null);
-  const [showHistory, setShowHistory] = useState(false);
-
-  const toggleHistory = () => {
-    setShowHistory(!showHistory);
-    setSelected(null);
+const currentTrivia = trivia[questionIndex];
+  const handleTriviaAnswer = (choice) => {
+    if (choice === currentTrivia.correct) setScore(score + 1);
+    if (questionIndex + 1 < trivia.length) setQuestionIndex(questionIndex + 1);
+    else setQuizFinished(true);
+  };
+  const resetTrivia = () => {
+    setScore(0);
+    setQuestionIndex(0);
+    setQuizFinished(false);
   };
 
-  const handleLetterClick = (letter) => {
-    setSelected(letter);
-    setShowHistory(false);
-  };
+  // === History Cards ===
+  const historyCards = [
+    {
+      id: 1,
+      title: "🌅 Origins of Baybayin",
+      image: baybayinImage,
+      content: `Baybayin originated from ancient scripts used in the Philippines before Spanish colonization. It was an abugida, meaning each character combined a consonant and vowel sound.`
+    },
+    {
+      id: 2,
+      title: "✒️ Kudlit Marks",
+      image: kudlitImage,
+      content: `A kudlit is a small mark used to change vowel sounds. Above the symbol = "e/i", below = "o/u". This system made reading and writing efficient and elegant.`
+    },
+    {
+      id: 3,
+      title: "➖ Pamudpod Symbol",
+      image: pamudpodImage,
+      content: `The pamudpod (or krus/ekis) removes the vowel “a” sound, turning “ka” into “k”. It’s a way to end a word with a pure consonant sound.`
+    },
+    {
+      id: 4,
+      title: "🕊️ Modern Revival",
+      image: modernRevivalImage,
+      content: `Baybayin was revived in the 2000s as a symbol of Filipino identity and heritage. Artists, designers, and schools now use it to promote cultural pride.`
+    }
+  ];
+
+  // === Timeline ===
+  const timeline = [
+    { year: 900, event: "Kawi script influences early Filipino writing." },
+    { year: 1565, event: "Spanish colonization begins; Baybayin widely used." },
+    { year: 1593, event: "Doctrina Christiana published in Baybayin." },
+    { year: 1700, event: "Latin alphabet replaces Baybayin in daily use." },
+    { year: 2000, event: "Cultural resurgence of Baybayin begins." },
+    { year: 2018, event: "Philippine Congress approves Baybayin Bill (House Bill 1022)." },
+  ];
+
+    const practiceExamples = [
+    { tagalog: "Araw", baybayin: "ᜀᜇᜏ᜔" },
+    { tagalog: "Bayan", baybayin: "ᜊᜌᜈ᜔" },
+    { tagalog: "Puso", baybayin: "ᜉᜓᜐᜓ" },
+    { tagalog: "Gabi", baybayin: "ᜄᜊᜒ" },
+  ];
 
   return (
-    <div>
-      <button className="history-btn" onClick={toggleHistory}>
-        {showHistory ? '▲ Hide Baybayin History' : '▼ Show Baybayin History'}
-      </button>
+  <div className="alphabet-chart-container">
+    <div className="history-btn-container">
 
-      {showHistory && (
-        // Add 'section-content' for general section styling
-        <div className="baybayin-history section-content"> 
-          <h3 className="section-title">What Is Baybayin?</h3> {/* Add a title class for consistent styling */}
-          <p>
-            Baybayin is a script that predated the Spanish colonization of the Philippines in 1565. The name "Baybayin" comes from the Tagalog root word "baybay" which means "to spell," and in addition to Tagalog, the script was used to write other Philippine languages like Ilocano, Pangasinan, and Bisaya.
-          </p>
-          
-          {/* Main content area for image and text */}
+  <button
+    className={`history-btn ${showHistory ? 'active' : ''}`}
+    onClick={toggleHistory}
+  >
+    {showHistory ? '▲ Interactive History' : '▼ Explore History'}
+  </button>
+
+  <button
+    className={`history-btn ${showFullHistory ? 'active' : ''}`}
+    onClick={toggleFullHistory}
+  >
+    {showFullHistory ? '▲ Full Written History' : '▼ Read Full History'}
+  </button>
+</div>
+
+{/* === PRACTICE SECTION BUTTON === */}
+      <div className="practice-btn-container">
+        <button className={`practice-toggle-btn ${showPractice ? "active" : ""}`} onClick={togglePractice}>
+          {showPractice ? "▲ Hide Practice Area" : "✍️ Practice Baybayin Writing"}
+        </button>
+      </div>
+
+      {/* === PRACTICE SECTION === */}
+      <AnimatePresence>
+        {showPractice && (
+          <motion.div
+            className="practice-section section-content"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+          >
+            <h3 className="section-title">✍️ Practice Baybayin</h3>
+            <p>Try writing Tagalog words below to see their Baybayin translation:</p>
+
+            <input
+              type="text"
+              placeholder="Type a Tagalog word..."
+              className="practice-input"
+              value={practiceInput}
+              onChange={(e) => setPracticeInput(e.target.value)}
+            />
+
+            <div className="practice-results">
+              {practiceExamples
+                .filter((ex) => ex.tagalog.toLowerCase().includes(practiceInput.toLowerCase()))
+                .map((ex, i) => (
+                  <motion.div key={i} className="practice-card" whileHover={{ scale: 1.05 }}>
+                    <p><strong>{ex.tagalog}</strong></p>
+                    <p className="baybayin-script">{ex.baybayin}</p>
+                  </motion.div>
+                ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
+      {/* === INTERACTIVE HISTORY === */}
+      <AnimatePresence>
+        {showHistory && (
+          <motion.div
+            className="interactive-history section-content"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+          >
+            <h2 className="section-title">🧭 Journey Through Baybayin</h2>
+            <p className="intro-text">
+              Discover how this ancient script shaped Filipino culture through stories, symbols, and sounds.
+            </p>
+
+            {/* === Flip Cards === */}
+            <div className="history-card-grid">
+              {historyCards.map((card) => (
+                <motion.div
+                  key={card.id}
+                  className={`history-card ${activeCard === card.id ? "active" : ""}`}
+                  onClick={() => setActiveCard(activeCard === card.id ? null : card.id)}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  {activeCard === card.id ? (
+                    <motion.div className="card-content" initial={{ rotateY: 180 }} animate={{ rotateY: 0 }}>
+                      <h4>{card.title}</h4>
+                      <p>{card.content}</p>
+                    </motion.div>
+                  ) : (
+                    <motion.div className="card-front">
+                      <img src={card.image} alt={card.title} />
+                      <h4>{card.title}</h4>
+                    </motion.div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+
+            {/* === Timeline === */}
+            <div className="timeline-container">
+              <h3>📜 Timeline of Baybayin</h3>
+              <div className="timeline">
+                {timeline.map((t, index) => (
+                  <motion.div key={index} className="timeline-event" whileHover={{ scale: 1.05 }}>
+                    <span className="timeline-year">{t.year}</span>
+                    <p>{t.event}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* === Trivia === */}
+            <div className="trivia-section">
+              <button className="practice-btn" onClick={() => setShowTrivia(!showTrivia)}>
+                {showTrivia ? "▲ Hide Trivia Quiz" : "🧠 Try Baybayin Trivia Quiz"}
+              </button>
+
+              <AnimatePresence>
+                {showTrivia && (
+                  <motion.div
+                    className="trivia-container"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    {!quizFinished ? (
+                      <>
+                        <h4>{currentTrivia.q}</h4>
+                        <div className="quiz-choices">
+                          {currentTrivia.a.map((ans, i) => (
+                            <button key={i} className="quiz-choice-btn" onClick={() => handleTriviaAnswer(ans)}>
+                              {ans}
+                            </button>
+                          ))}
+                        </div>
+                        <p>Score: {score} / {trivia.length}</p>
+                      </>
+                    ) : (
+                      <div className="quiz-results">
+                        <h4>🎉 You finished the trivia!</h4>
+                        <p>Your score: {score} / {trivia.length}</p>
+                        <button className="retry-btn" onClick={resetTrivia}>Try Again</button>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* === FULL BAYBAYIN HISTORY SECTION === */}
+      <AnimatePresence>
+        {showFullHistory && (
+          <motion.div
+            className="baybayin-history section-content"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.4 }}
+          >
+            <h3 className="section-title">What Is Baybayin?</h3>
+            <p>
+              Baybayin is a script that predated the Spanish colonization of the Philippines in 1565. 
+              The name "Baybayin" comes from the Tagalog root word "baybay" which means "to spell."
+            </p>
+
           <div className="history-main-content">
             <img 
               src={baybayinImage} 
@@ -158,31 +358,9 @@ export default function AlphabetChart() {
         <h3>Learn More About Your Filipino Heritage</h3>
           <p>Now you can begin researching your Filipino family and heritage using the FamilySearch Philippines page. Here you can use the Baybayin names translator to write your surname in Baybayin and download and print a name sheet for your family history files.</p>
           <p>Thank you for reading! I hope you learn a lot!</p>
-
-
-        </div>
-      )}
-      
-      <h3>Baybayin Alphabet (A–Z)</h3>
-      <div className="alphabet-grid">
-        {baybayinLetters.map((letter) => (
-          <div
-            key={letter.alphabetID}
-            className="letter-card"
-            onClick={() => handleLetterClick(letter)}
-          >
-            {letter.symbol}
-          </div>
-        ))}
-      </div>
-
-      {selected && (
-        <div className="selected-letter">
-          <h4>{selected.symbol} — {selected.letter}</h4>
-          <p>{selected.pronunciation}</p>
-          <button className="close-btn" onClick={() => setSelected(null)}>✖ Close</button>
-        </div>
-      )}
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+   </div>
   );
 }

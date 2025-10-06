@@ -841,3 +841,21 @@ main {
   color: #5a442a;
   margin-top: 0.5rem;
 }
+
+.translation-result {
+  margin-top: 1.5rem;
+  background: #fff7db;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.translation-result p {
+  margin: 0.3rem 0;
+}
+
+.baybayin-script {
+  font-size: 2rem;
+  color: #4b3f2f;
+}

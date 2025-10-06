@@ -95,6 +95,75 @@ const currentTrivia = trivia[questionIndex];
     { tagalog: "Gabi", baybayin: "ᜄᜊᜒ" },
   ];
 
+  // === SMART BAYBAYIN TRANSLITERATION SYSTEM ===
+const transliterateToBaybayin = (word) => {
+  if (!word) return "";
+
+  const map = {
+    a: "ᜀ", e: "ᜁ", i: "ᜁ", o: "ᜂ", u: "ᜂ",
+    ka: "ᜃ", ga: "ᜄ", nga: "ᜅ", ta: "ᜆ",
+    da: "ᜇ", na: "ᜈ", pa: "ᜉ", ba: "ᜊ",
+    ma: "ᜋ", ya: "ᜌ", ra: "ᜍ", la: "ᜎ",
+    wa: "ᜏ", sa: "ᜐ", ha: "ᜑ"
+  };
+
+  // Kudlit modifiers for vowels
+  const kudlit = {
+    i: "ᜒ", e: "ᜒ",
+    u: "ᜓ", o: "ᜓ"
+  };
+
+  let result = "";
+  let i = 0;
+  const text = word.toLowerCase().replace(/[^a-z]/g, "");
+
+  while (i < text.length) {
+    let chunk = text.slice(i, i + 3);
+
+    // Handle “nga”
+    if (chunk.startsWith("nga")) {
+      result += map["nga"];
+      i += 3;
+      continue;
+    }
+
+    // Handle consonant + vowel (e.g., ka, ki, ku, ke, ko)
+    const c = text[i];
+    const v = text[i + 1];
+
+    if (["k", "g", "t", "d", "n", "p", "b", "m", "y", "r", "l", "w", "s", "h"].includes(c)) {
+      // Default consonant with 'a' sound
+      if (v === "a") {
+        result += map[c + "a"];
+        i += 2;
+      }
+      // Consonant with kudlit
+      else if (v && kudlit[v]) {
+        result += map[c + "a"] + kudlit[v];
+        i += 2;
+      }
+      // Consonant with no vowel (final consonant → add pamudpod)
+      else {
+        result += map[c + "a"] + "᜔";
+        i += 1;
+      }
+      continue;
+    }
+
+    // Handle standalone vowels
+    if (["a", "e", "i", "o", "u"].includes(c)) {
+      result += map[c];
+      i += 1;
+      continue;
+    }
+
+    // Skip any unsupported character
+    i += 1;
+  }
+
+  return result;
+};
+
   return (
   <div className="alphabet-chart-container">
     <div className="history-btn-container">
@@ -121,39 +190,35 @@ const currentTrivia = trivia[questionIndex];
         </button>
       </div>
 
-      {/* === PRACTICE SECTION === */}
-      <AnimatePresence>
-        {showPractice && (
-          <motion.div
-            className="practice-section section-content"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
-          >
-            <h3 className="section-title">✍️ Practice Baybayin</h3>
-            <p>Try writing Tagalog words below to see their Baybayin translation:</p>
+ {/* === PRACTICE SECTION === */}
+<AnimatePresence>
+  {showPractice && (
+    <motion.div
+      className="practice-section section-content"
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 30 }}
+    >
+      <h3 className="section-title">✍️ Practice Baybayin</h3>
+      <p>Type a Tagalog word to automatically see its Baybayin translation:</p>
 
-            <input
-              type="text"
-              placeholder="Type a Tagalog word..."
-              className="practice-input"
-              value={practiceInput}
-              onChange={(e) => setPracticeInput(e.target.value)}
-            />
+      <input
+        type="text"
+        placeholder="Halimbawa: kamusta, araw, tubig..."
+        className="practice-input"
+        value={practiceInput}
+        onChange={(e) => setPracticeInput(e.target.value)}
+      />
 
-            <div className="practice-results">
-              {practiceExamples
-                .filter((ex) => ex.tagalog.toLowerCase().includes(practiceInput.toLowerCase()))
-                .map((ex, i) => (
-                  <motion.div key={i} className="practice-card" whileHover={{ scale: 1.05 }}>
-                    <p><strong>{ex.tagalog}</strong></p>
-                    <p className="baybayin-script">{ex.baybayin}</p>
-                  </motion.div>
-                ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {practiceInput && (
+        <div className="translation-result">
+          <p><strong>Tagalog:</strong> {practiceInput}</p>
+          <p className="baybayin-script">{transliterateToBaybayin(practiceInput)}</p>
+        </div>
+      )}
+    </motion.div>
+  )}
+</AnimatePresence>
 
 
       {/* === INTERACTIVE HISTORY === */}

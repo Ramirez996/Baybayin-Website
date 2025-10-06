@@ -1,129 +1,175 @@
-import { useState } from 'react';
-import '../css/LoginSignup.css';
+import React, { useState, useEffect } from "react";
+import { auth, provider } from "../firebaseConfig.js";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  sendEmailVerification,
+} from "firebase/auth";
+import { motion, AnimatePresence } from "framer-motion";
+import googleIcon from "../images/google.png";
+import "../css/LoginSignup.css";
 
 export default function LoginSignup({ onLogin }) {
-  const [isSignup, setIsSignup] = useState(false);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState(null);
-  // NEW: State for loading status
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [progress, setProgress] = useState(0);
 
-  // Helper component for message box (used only within this component)
-  const Message = ({ text, type }) => {
-      const className = `login-message ${type || 'info'}`;
-      return (
-          <div className={className}>
-              <p>{text}</p>
-              <button onClick={() => setMessage(null)}>Close</button>
-          </div>
-      );
-  };
+  // 🔹 Google Sign-In
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-  // Authentication class methods
-  const getUsers = () => JSON.parse(localStorage.getItem('users') || '[]');
-  const saveUsers = (users) => localStorage.setItem('users', JSON.stringify(users));
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    setMessage(null);
-    setIsLoading(true); // Start loading animation
-
-    setTimeout(() => { // Added delay for visual effect
-      const users = getUsers();
-      const user = users.find(u => u.email === email && u.password === password);
-      
-      if (user) {
-        onLogin({
-          userID: user.userID,
-          name: user.name,
-          email: user.email,
-          password: user.password
-        });
-      } else {
-        setMessage({text: "Invalid email or password. Please try again.", type: 'error'});
-        setIsLoading(false); // Stop loading on failure
-      }
-    }, 800); // 800ms delay
-  };
-
-  const handleSignup = (e) => {
-    e.preventDefault();
-    setMessage(null);
-    if (!name || !email || !password) {
-      setMessage({text: "Please fill in all fields to sign up.", type: 'error'});
-      return;
+      setUserName(user.displayName || "Google User");
+      setSuccess(true);
+    } catch (error) {
+      alert(error.message);
     }
-    
-    setIsLoading(true); // Start loading animation
-    
-    setTimeout(() => { // Added delay for visual effect
-      const users = getUsers();
-      if (users.find(u => u.email === email)) {
-        setMessage({text: "Email is already registered. Please login instead.", type: 'error'});
-        setIsLoading(false); // Stop loading on failure
-        return;
-      }
-      const newUser = {
-        userID: Date.now(),
-        name,
-        email,
-        password,
-      };
-      saveUsers([...users, newUser]);
-      setMessage({text: `Account created for ${name}! You can now log in.`, type: 'success'});
-      
-      // Reset form and state after success
-      setIsSignup(false);
-      setName(''); setEmail(''); setPassword('');
-      setIsLoading(false); // Stop loading on success
-    }, 800); // 800ms delay
   };
+
+  // 🔹 Email/Password Authentication
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    try {
+      if (isLogin) {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        if (userCredential.user.emailVerified) {
+          setUserName(userCredential.user.email);
+          setSuccess(true);
+        } else {
+          alert(
+            "Please verify your email first before logging in. Check your inbox!"
+          );
+        }
+      } else {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        await sendEmailVerification(userCredential.user);
+        alert(
+          "Account created! A verification email has been sent. Please verify before logging in."
+        );
+        auth.signOut();
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  // 🔹 Progress bar countdown effect
+  useEffect(() => {
+    if (success) {
+      let timer = 0;
+      const interval = setInterval(() => {
+        timer += 100; // every 100ms
+        setProgress((timer / 3500) * 100);
+        if (timer >= 3500) {
+          clearInterval(interval);
+          onLogin({ name: userName, email });
+        }
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, [success, userName, email, onLogin]);
 
   return (
-    <div className="login-card">
-      {message && <Message text={message.text} type={message.type} />} 
+    <div className="login-container">
+      <AnimatePresence mode="wait">
+        {!success ? (
+          <motion.div
+            key="login-card"
+            className="login-card"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+          >
+            <h3>{isLogin ? "Welcome Back!" : "Create Account"}</h3>
 
-      <h3>{isSignup ? 'Sign Up' : 'Welcome Back!'}</h3>
-      <form onSubmit={isSignup ? handleSignup : handleLogin}>
-        {isSignup && (
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={isLoading} // Disable fields while loading
-          />
+            <form onSubmit={handleAuth}>
+              <input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+
+              <button type="submit">{isLogin ? "Login" : "Sign Up"}</button>
+            </form>
+
+            <div className="divider">
+              <span>OR</span>
+            </div>
+
+            <button className="google-btn" onClick={handleGoogleSignIn}>
+              <img src={googleIcon} alt="Google" className="google-icon" />
+              Continue with Google
+            </button>
+
+            <div className="toggle-text">
+              {isLogin ? (
+                <>
+                  Don’t have an account?{" "}
+                  <span className="toggle-link" onClick={() => setIsLogin(false)}>
+                    Sign up here
+                  </span>
+                </>
+              ) : (
+                <>
+                  Already have an account?{" "}
+                  <span className="toggle-link" onClick={() => setIsLogin(true)}>
+                    Login here
+                  </span>
+                </>
+              )}
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="success-card"
+            className="success-card"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+          >
+            <div className="success-icon">Success!!</div>
+            <h2>Welcome, {userName.split("@")[0]}!</h2>
+            <p>You’ve successfully logged in!</p>
+
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+            <p style={{ fontSize: "0.85rem", color: "#555", marginTop: "8px" }}>
+              Redirecting shortly...
+            </p>
+          </motion.div>
         )}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={isLoading} // Disable fields while loading
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={isLoading} // Disable fields while loading
-        />
-        {/* Conditional rendering of spinner and text, disabled attribute controls CSS styles */}
-        <button type="submit" disabled={isLoading}>
-            {isLoading && <div className="loading-spinner"></div>}
-            <span className="button-text">
-                {isSignup ? 'Sign Up' : 'Login'}
-            </span>
-        </button>
-      </form>
-      <p className="toggle-text">
-        {isSignup ? 'Already have an account?' : 'Don’t have an account?'}
-        <span className="toggle-link" onClick={() => {setIsSignup(!isSignup); setMessage(null);}}>
-          {isSignup ? 'Login here' : ' Sign up here'}
-        </span>
-      </p>
+      </AnimatePresence>
     </div>
   );
 }

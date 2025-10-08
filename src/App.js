@@ -119,19 +119,26 @@ export default function App() {
 
       {/* === Dropdown Menu === */}
       <div className="dropdown-container">
-        <button className="menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          ☰ Menu
-        </button>
+  <button
+    className={`menu-btn ${isMenuOpen ? 'active' : ''}`}
+    onClick={() => setIsMenuOpen(!isMenuOpen)}
+  >
+    {isMenuOpen ? '✕ Close' : '☰ Menu'}
+  </button>
 
-        {isMenuOpen && (
-          <div className="dropdown-menu">
-            <button onClick={() => setActiveSection(null)}>🏠 Home</button>
-            <button onClick={() => setActiveSection('education')}>📖 Education</button>
-            <button onClick={() => setActiveSection('fashion')}>🛍️ Design & Fashion</button>
-            <button onClick={() => setActiveSection('government')}>🏛️ Government</button>
-          </div>
-        )}
-      </div>
+  {/* Overlay for closing when clicking outside */}
+  <div
+    className={`menu-overlay ${isMenuOpen ? 'open' : ''}`}
+    onClick={() => setIsMenuOpen(false)}
+  ></div>
+
+  <div className={`dropdown-menu ${isMenuOpen ? 'open' : ''}`}>
+    <button onClick={() => { setActiveSection(null); setIsMenuOpen(false); }}>🏠 Home</button>
+    <button onClick={() => { setActiveSection('education'); setIsMenuOpen(false); }}>📖 Education</button>
+    <button onClick={() => { setActiveSection('fashion'); setIsMenuOpen(false); }}>🛍️ Design & Fashion</button>
+    <button onClick={() => { setActiveSection('government'); setIsMenuOpen(false); }}>🏛️ Government</button>
+  </div>
+</div>
 
       {/* === Logout Button === */}
       <button
@@ -227,6 +234,7 @@ export default function App() {
       <footer className="footer">
         <p>CSA5 | © 2025 Reviving Baybayin Project | Preserving Heritage Through Technology</p>
       </footer>
+      
 {/* === Floating Social Links === */}
 <div className="floating-socials">
   <a

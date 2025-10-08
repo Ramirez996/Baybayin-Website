@@ -18,7 +18,7 @@ main {
 
 .hero {
   text-align: center;
-  padding: 60px 20px;
+  padding: 160px 20px;
   background: linear-gradient(to right, #fce38a, #f38181);
   color: #222;
 }
@@ -447,59 +447,69 @@ main {
     }
 }
 
-/* === Dropdown Menu === */
+/* === Menu Container === */
 .dropdown-container {
   position: fixed;
   top: 15px;
   left: 15px;
-  z-index: 999;
+  z-index: 1001;
 }
 
+/* === Menu Button === */
 .menu-btn {
   background-color: #d9534f;
   color: #fff;
   font-size: 18px;
   border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .menu-btn:hover {
   background-color: #c9302c;
-    transform: translateY(-1px);
+  transform: scale(1.05);
 }
 
+/* When open, rotate icon slightly */
+.menu-btn.active {
+  background-color: #b52b27;
+  transform: rotate(5deg);
+}
+
+/* === Sliding Side Menu === */
 .dropdown-menu {
-  position: absolute;
-  top: 45px;
-  left: 0;
+  position: fixed;
+  top: 0;
+  left: -270px;
+  width: 250px;
+  height: 100vh;
   background-color: #fff8f1;
-  border: 2px solid #5b3b1f;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border-right: 3px solid #5b3b1f;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  padding: 10px;
-  min-width: 180px;
-  animation: fadeIn 0.2s ease-in-out;
+  padding: 20px 10px;
+  transition: left 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 1000;
+}
+
+/* When open */
+.dropdown-menu.open {
+  left: 0;
 }
 
 .dropdown-menu button {
   background: none;
   border: none;
-  padding: 10px;
+  padding: 12px;
   text-align: left;
-  font-size: 15px;
+  font-size: 16px;
   cursor: pointer;
-  color: #3b2a1a;
-  transition: background 0.2s ease;
-}
-
-.dropdown-menu button:hover {
-  background-color: #e0cbb0;
-  border-radius: 6px;
 }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }

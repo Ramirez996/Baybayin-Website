@@ -264,7 +264,7 @@ const handleProceedToPayment = ({ address, paymentMethod }) => {
 {/* === Floating Social Links === */}
 <div className="floating-socials">
   <a
-    href="https://www.facebook.com/profile.php?id=61582273744716"
+    href="https://www.facebook.com/profile.php?id=61576101534146"
     target="_blank"
     rel="noopener noreferrer"
     className="social-btn"

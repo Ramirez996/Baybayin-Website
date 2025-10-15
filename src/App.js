@@ -274,7 +274,7 @@ const handleProceedToPayment = ({ address, paymentMethod }) => {
   </a>
 
   <a
-    href="https://www.instagram.com/YourPageHere"
+    href="https://www.instagram.com/baybayin_initiatives/"
     target="_blank"
     rel="noopener noreferrer"
     className="social-btn"
@@ -284,7 +284,7 @@ const handleProceedToPayment = ({ address, paymentMethod }) => {
   </a>
 
   <a
-    href="https://x.com/YourPageHere"
+    href="https://x.com/BaybayinI"
     target="_blank"
     rel="noopener noreferrer"
     className="social-btn"

@@ -6,7 +6,6 @@ const SuccessModal = ({ orderDetails, cart, onContinueShopping }) => (
     <div className="modal-backdrop">
         <div className="card success-modal">
             <span className="close-btn" onClick={onContinueShopping}>&times;</span>
-            <div className="success-icon">✅</div>
             <h3>Order Confirmed!</h3>
             <p className="confirmation-message">
                 Thank you for your purchase! Your order has been placed successfully.

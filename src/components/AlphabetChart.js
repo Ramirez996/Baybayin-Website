@@ -26,6 +26,9 @@ export default function AlphabetChart() {
   const togglePractice = () => setShowPractice(!showPractice);
   const [selectedCard, setSelectedCard] = useState(null);
 
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [isAnswering, setIsAnswering] = useState(false);
+
   const trivia = [
     { q: "What does the word 'Baybayin' mean?", a: ["To write", "To spell", "To speak", "To draw"], correct: "To spell" },
     { q: "What type of writing system is Baybayin?", a: ["Alphabet", "Syllabary", "Abugida", "Abjad"], correct: "Abugida" },
@@ -244,7 +247,7 @@ export default function AlphabetChart() {
               </div>
             </div>
 
-            {/* === Trivia === */}
+{/* === Trivia === */}
             <div className="trivia-section">
               <button className="practice-btn" onClick={() => setShowTrivia(!showTrivia)}>
                 {showTrivia ? "▲ Hide Trivia Quiz" : "🧠 Try Baybayin Trivia Quiz"}
@@ -252,16 +255,34 @@ export default function AlphabetChart() {
 
               <AnimatePresence>
                 {showTrivia && (
-                  <motion.div className="trivia-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                  <motion.div
+                    className="trivia-container"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                  >
                     {!quizFinished ? (
                       <>
                         <h4>{currentTrivia.q}</h4>
                         <div className="quiz-choices">
-                          {currentTrivia.a.map((ans, i) => (
-                            <button key={i} className="quiz-choice-btn" onClick={() => handleTriviaAnswer(ans)}>
-                              {ans}
-                            </button>
-                          ))}
+                          {currentTrivia.a.map((ans, i) => {
+                            // Determine class name for coloring feedback
+                            let choiceClass = "";
+                            if (selectedAnswer) {
+                              if (ans === currentTrivia.correct) choiceClass = "correct";
+                              else if (ans === selectedAnswer) choiceClass = "wrong";
+                            }
+                            return (
+                              <button
+                                key={i}
+                                className={`quiz-choice-btn ${choiceClass}`}
+                                onClick={() => handleTriviaAnswer(ans)}
+                                disabled={isAnswering}
+                              >
+                                {ans}
+                              </button>
+                            );
+                          })}
                         </div>
                         <p>Score: {score} / {trivia.length}</p>
                       </>

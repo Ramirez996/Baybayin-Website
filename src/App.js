@@ -5,6 +5,7 @@ import AlphabetChart from './components/AlphabetChart';
 import Shop from './components/Shop';
 import GovernmentBills from './components/GovernmentBills';
 import Cart from './components/Cart';
+import Checkout from './components/Checkout';
 import Order from './components/Order';
 import Payment from './components/Payment';
 import facebookIcon from './images/facebook.png';
@@ -21,8 +22,9 @@ export default function App() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
-  const [isCartVisible, setIsCartVisible] = useState(false); // ✅ controls cart view
-  const [showModal, setShowModal] = useState(false); // ✅ new: modal visibility
+  const [isCartVisible, setIsCartVisible] = useState(false); 
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);  
 
   // === Message Component ===
   const Message = ({ text, onClose, type }) => (
@@ -76,19 +78,29 @@ export default function App() {
     return cartItems.reduce((sum, item) => sum + item.price, 0);
   };
 
-  const handleCheckout = () => {
+const handleCheckout = () => {
     if (cartItems.length > 0) {
-      const newOrder = {
+        // Show the Checkout form (Shipping/Payment details)
+        setShowCheckoutForm(true); 
+        setIsCartVisible(true); // Ensure cart view is still active
+        setCurrentOrder(null); // Reset order data while collecting details
+    }
+};
+
+// 🆕 New Handler to process data from the Checkout Form and initiate the Order/Payment flow
+const handleProceedToPayment = ({ address, paymentMethod }) => {
+    const newOrder = {
         orderID: `ORD-${Date.now()}`,
         orderDate: new Date(),
         totalAmount: calculateTotal(),
         status: 'Pending',
-        deliveryAddress: '',
-      };
-      setCurrentOrder(newOrder);
-      setIsPaymentConfirmed(false);
-    }
-  };
+        deliveryAddress: address, // Use the address from the form
+        paymentMethod: paymentMethod // Store payment method
+    };
+    setCurrentOrder(newOrder);
+    setIsPaymentConfirmed(false);
+    setShowCheckoutForm(false); // Hide the checkout form
+};
 
   const handleConfirmPayment = (paymentDetails) => {
     setIsPaymentConfirmed(true);
@@ -184,30 +196,44 @@ export default function App() {
               🛒 {isCartVisible ? 'Back to Products' : `View Cart (${cartItems.length})`}
             </button>
 
-            {/* ✅ Toggle between products and cart */}
-            {!isCartVisible ? (
-              <div className="shop-grid">
-                <Shop onAddToCart={addToCart} />
-              </div>
-            ) : (
-              <Cart
-                cartItems={cartItems}
-                onRemoveFromCart={removeFromCart}
-                onCheckout={handleCheckout}
-                calculateTotal={calculateTotal}
-              />
-            )}
+{/* ✅ Toggle between products and cart/checkout/payment */}
+    {!isCartVisible ? (
+      <div className="shop-grid">
+        <Shop onAddToCart={addToCart} />
+      </div>
+    ) : (
+      <>
+        {/* 1. Cart View */}
+        {!currentOrder && !showCheckoutForm && (
+          <Cart
+            cartItems={cartItems}
+            onRemoveFromCart={removeFromCart}
+            // When "Checkout" is clicked in Cart, it sets showCheckoutForm to true
+            onCheckout={handleCheckout} 
+            calculateTotal={calculateTotal}
+          />
+        )}
 
-            {/* === Order & Payment Handling === */}
-            {currentOrder && !isPaymentConfirmed && (
-              <div>
-                <Order order={currentOrder} />
-                <Payment
-                  totalAmount={currentOrder.totalAmount}
-                  onConfirmPayment={handleConfirmPayment}
-                />
-              </div>
-            )}
+        {/* 2. Checkout Form (Shipping/Payment Details) */}
+        {showCheckoutForm && (
+          <Checkout 
+            cart={cartItems} 
+            onProceed={handleProceedToPayment} 
+          />
+        )}
+
+        {/* 3. Order & Payment Handling (after checkout form is submitted) */}
+        {currentOrder && !isPaymentConfirmed && (
+          <div>
+            <Order order={currentOrder} />
+            <Payment
+              totalAmount={currentOrder.totalAmount}
+              onConfirmPayment={handleConfirmPayment}
+            />
+          </div>
+        )}
+      </>
+    )}
           </section>
         )}
 

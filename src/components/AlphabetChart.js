@@ -19,15 +19,15 @@ export default function AlphabetChart() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
 
-  // === Handlers ===
   const toggleHistory = () => setShowHistory(!showHistory);
   const toggleFullHistory = () => setShowFullHistory(!showFullHistory);
   const [showPractice, setShowPractice] = useState(false);
   const [practiceInput, setPracticeInput] = useState("");
   const togglePractice = () => setShowPractice(!showPractice);
+  const [selectedCard, setSelectedCard] = useState(null);
 
   const trivia = [
-       { q: "What does the word 'Baybayin' mean?", a: ["To write", "To spell", "To speak", "To draw"], correct: "To spell" },
+    { q: "What does the word 'Baybayin' mean?", a: ["To write", "To spell", "To speak", "To draw"], correct: "To spell" },
     { q: "What type of writing system is Baybayin?", a: ["Alphabet", "Syllabary", "Abugida", "Abjad"], correct: "Abugida" },
     { q: "Which mark changes the vowel sound in Baybayin?", a: ["Kudlit", "Pamudpod", "Krus", "Ekis"], correct: "Kudlit" },
     { q: "What is used to remove the vowel 'a' sound in Baybayin?", a: ["Pamudpod", "Kudlit", "Bituin", "Tambal"], correct: "Pamudpod" },
@@ -38,7 +38,7 @@ export default function AlphabetChart() {
     { q: "What does the Kudlit mark do?", a: ["Changes vowel", "Removes vowel", "Adds consonant", "Makes pause"], correct: "Changes vowel" },
   ];
 
-const currentTrivia = trivia[questionIndex];
+  const currentTrivia = trivia[questionIndex];
   const handleTriviaAnswer = (choice) => {
     if (choice === currentTrivia.correct) setScore(score + 1);
     if (questionIndex + 1 < trivia.length) setQuestionIndex(questionIndex + 1);
@@ -56,25 +56,29 @@ const currentTrivia = trivia[questionIndex];
       id: 1,
       title: "🌅 Origins of Baybayin",
       image: baybayinImage,
-      content: `Baybayin originated from ancient scripts used in the Philippines before Spanish colonization. It was an abugida, meaning each character combined a consonant and vowel sound.`
+      content: `Baybayin originated from ancient scripts used in the Philippines before Spanish colonization.`,
+      details: `Baybayin descended from Brahmic scripts via Kawi, used by Tagalog and Kapampangan groups for poetry, letters, and rituals.`
     },
     {
       id: 2,
       title: "✒️ Kudlit Marks",
       image: kudlitImage,
-      content: `A kudlit is a small mark used to change vowel sounds. Above the symbol = "e/i", below = "o/u". This system made reading and writing efficient and elegant.`
+      content: `A kudlit is a small mark used to change vowel sounds.`,
+      details: `Kudlit marks alter the inherent "a" sound — above for "e/i" and below for "o/u".`
     },
     {
       id: 3,
       title: "➖ Pamudpod Symbol",
       image: pamudpodImage,
-      content: `The pamudpod (or krus/ekis) removes the vowel “a” sound, turning “ka” into “k”. It’s a way to end a word with a pure consonant sound.`
+      content: `The pamudpod removes the vowel “a” sound, turning “ka” into “k”.`,
+      details: `Introduced during Spanish influence, it allowed Baybayin to represent final consonants.`
     },
     {
       id: 4,
       title: "🕊️ Modern Revival",
       image: modernRevivalImage,
-      content: `Baybayin was revived in the 2000s as a symbol of Filipino identity and heritage. Artists, designers, and schools now use it to promote cultural pride.`
+      content: `Baybayin was revived in the 2000s as a symbol of Filipino identity and heritage.`,
+      details: `Today, Baybayin appears in art, education, and cultural law efforts like the 2018 Baybayin Bill.`
     }
   ];
 
@@ -88,140 +92,88 @@ const currentTrivia = trivia[questionIndex];
     { year: 2018, event: "Philippine Congress approves Baybayin Bill (House Bill 1022)." },
   ];
 
-    const practiceExamples = [
+  const practiceExamples = [
     { tagalog: "Araw", baybayin: "ᜀᜇᜏ᜔" },
     { tagalog: "Bayan", baybayin: "ᜊᜌᜈ᜔" },
     { tagalog: "Puso", baybayin: "ᜉᜓᜐᜓ" },
     { tagalog: "Gabi", baybayin: "ᜄᜊᜒ" },
   ];
 
-  // === SMART BAYBAYIN TRANSLITERATION SYSTEM ===
-const transliterateToBaybayin = (word) => {
-  if (!word) return "";
-
-  const map = {
-    a: "ᜀ", e: "ᜁ", i: "ᜁ", o: "ᜂ", u: "ᜂ",
-    ka: "ᜃ", ga: "ᜄ", nga: "ᜅ", ta: "ᜆ",
-    da: "ᜇ", na: "ᜈ", pa: "ᜉ", ba: "ᜊ",
-    ma: "ᜋ", ya: "ᜌ", ra: "ᜍ", la: "ᜎ",
-    wa: "ᜏ", sa: "ᜐ", ha: "ᜑ"
-  };
-
-  // Kudlit modifiers for vowels
-  const kudlit = {
-    i: "ᜒ", e: "ᜒ",
-    u: "ᜓ", o: "ᜓ"
-  };
-
-  let result = "";
-  let i = 0;
-  const text = word.toLowerCase().replace(/[^a-z]/g, "");
-
-  while (i < text.length) {
-    let chunk = text.slice(i, i + 3);
-
-    // Handle “nga”
-    if (chunk.startsWith("nga")) {
-      result += map["nga"];
-      i += 3;
-      continue;
-    }
-
-    // Handle consonant + vowel (e.g., ka, ki, ku, ke, ko)
-    const c = text[i];
-    const v = text[i + 1];
-
-    if (["k", "g", "t", "d", "n", "p", "b", "m", "y", "r", "l", "w", "s", "h"].includes(c)) {
-      // Default consonant with 'a' sound
-      if (v === "a") {
-        result += map[c + "a"];
-        i += 2;
+  // === Transliteration System ===
+  const transliterateToBaybayin = (word) => {
+    if (!word) return "";
+    const map = {
+      a: "ᜀ", e: "ᜁ", i: "ᜁ", o: "ᜂ", u: "ᜂ",
+      ka: "ᜃ", ga: "ᜄ", nga: "ᜅ", ta: "ᜆ",
+      da: "ᜇ", na: "ᜈ", pa: "ᜉ", ba: "ᜊ",
+      ma: "ᜋ", ya: "ᜌ", ra: "ᜍ", la: "ᜎ",
+      wa: "ᜏ", sa: "ᜐ", ha: "ᜑ"
+    };
+    const kudlit = { i: "ᜒ", e: "ᜒ", u: "ᜓ", o: "ᜓ" };
+    let result = "", i = 0;
+    const text = word.toLowerCase().replace(/[^a-z]/g, "");
+    while (i < text.length) {
+      let chunk = text.slice(i, i + 3);
+      if (chunk.startsWith("nga")) { result += map["nga"]; i += 3; continue; }
+      const c = text[i], v = text[i + 1];
+      if (["k", "g", "t", "d", "n", "p", "b", "m", "y", "r", "l", "w", "s", "h"].includes(c)) {
+        if (v === "a") { result += map[c + "a"]; i += 2; }
+        else if (v && kudlit[v]) { result += map[c + "a"] + kudlit[v]; i += 2; }
+        else { result += map[c + "a"] + "᜔"; i += 1; }
+        continue;
       }
-      // Consonant with kudlit
-      else if (v && kudlit[v]) {
-        result += map[c + "a"] + kudlit[v];
-        i += 2;
-      }
-      // Consonant with no vowel (final consonant → add pamudpod)
-      else {
-        result += map[c + "a"] + "᜔";
-        i += 1;
-      }
-      continue;
-    }
-
-    // Handle standalone vowels
-    if (["a", "e", "i", "o", "u"].includes(c)) {
-      result += map[c];
+      if (["a", "e", "i", "o", "u"].includes(c)) { result += map[c]; i += 1; continue; }
       i += 1;
-      continue;
     }
-
-    // Skip any unsupported character
-    i += 1;
-  }
-
-  return result;
-};
+    return result;
+  };
 
   return (
-  <div className="alphabet-chart-container">
-    <div className="history-btn-container">
+    <div className="alphabet-chart-container">
+      <div className="history-btn-container">
+        <button
+          className={`history-btn ${showHistory ? 'active' : ''}`}
+          onClick={toggleHistory}
+        >
+          {showHistory ? '▲ Interactive History' : '▼ Explore History'}
+        </button>
+      </div>
 
-  <button
-    className={`history-btn ${showHistory ? 'active' : ''}`}
-    onClick={toggleHistory}
-  >
-    {showHistory ? '▲ Interactive History' : '▼ Explore History'}
-  </button>
-
-  <button
-    className={`history-btn ${showFullHistory ? 'active' : ''}`}
-    onClick={toggleFullHistory}
-  >
-    {showFullHistory ? '▲ Full Written History' : '▼ Read Full History'}
-  </button>
-</div>
-
-{/* === PRACTICE SECTION BUTTON === */}
+      {/* === Practice Section === */}
       <div className="practice-btn-container">
         <button className={`practice-toggle-btn ${showPractice ? "active" : ""}`} onClick={togglePractice}>
           {showPractice ? "▲ Hide Practice Area" : "✍️ Practice Baybayin Writing"}
         </button>
       </div>
 
- {/* === PRACTICE SECTION === */}
-<AnimatePresence>
-  {showPractice && (
-    <motion.div
-      className="practice-section section-content"
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 30 }}
-    >
-      <h3 className="section-title">✍️ Practice Baybayin</h3>
-      <p>Type a Tagalog word to automatically see its Baybayin translation:</p>
+      <AnimatePresence>
+        {showPractice && (
+          <motion.div
+            className="practice-section section-content"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+          >
+            <h3 className="section-title">✍️ Practice Baybayin</h3>
+            <p>Type a Tagalog word to automatically see its Baybayin translation:</p>
+            <input
+              type="text"
+              placeholder="Halimbawa: kamusta, araw, tubig..."
+              className="practice-input"
+              value={practiceInput}
+              onChange={(e) => setPracticeInput(e.target.value)}
+            />
+            {practiceInput && (
+              <div className="translation-result">
+                <p><strong>Tagalog:</strong> {practiceInput}</p>
+                <p className="baybayin-script">{transliterateToBaybayin(practiceInput)}</p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <input
-        type="text"
-        placeholder="Halimbawa: kamusta, araw, tubig..."
-        className="practice-input"
-        value={practiceInput}
-        onChange={(e) => setPracticeInput(e.target.value)}
-      />
-
-      {practiceInput && (
-        <div className="translation-result">
-          <p><strong>Tagalog:</strong> {practiceInput}</p>
-          <p className="baybayin-script">{transliterateToBaybayin(practiceInput)}</p>
-        </div>
-      )}
-    </motion.div>
-  )}
-</AnimatePresence>
-
-
-      {/* === INTERACTIVE HISTORY === */}
+      {/* === Interactive History === */}
       <AnimatePresence>
         {showHistory && (
           <motion.div
@@ -231,11 +183,22 @@ const transliterateToBaybayin = (word) => {
             exit={{ opacity: 0, y: 30 }}
           >
             <h2 className="section-title">🧭 Journey Through Baybayin</h2>
-            <p className="intro-text">
-              Discover how this ancient script shaped Filipino culture through stories, symbols, and sounds.
-            </p>
+            <p className="intro-text">Discover how this ancient script shaped Filipino culture through stories, symbols, and sounds.</p>
 
-            {/* === Flip Cards === */}
+            {/* === Card Modals === */}
+            <AnimatePresence>
+              {selectedCard && (
+                <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <motion.div className="modal-content" initial={{ scale: 0.8, y: -30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.8, y: 30 }}>
+                    <h3>{selectedCard.title}</h3>
+                    <p>{selectedCard.details}</p>
+                    <button className="close-modal-btn" onClick={() => setSelectedCard(null)}>Close</button>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* === Cards === */}
             <div className="history-card-grid">
               {historyCards.map((card) => (
                 <motion.div
@@ -248,6 +211,15 @@ const transliterateToBaybayin = (word) => {
                     <motion.div className="card-content" initial={{ rotateY: 180 }} animate={{ rotateY: 0 }}>
                       <h4>{card.title}</h4>
                       <p>{card.content}</p>
+                      <button
+                        className="see-more-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCard(card);
+                        }}
+                      >
+                        See More
+                      </button>
                     </motion.div>
                   ) : (
                     <motion.div className="card-front">
@@ -280,12 +252,7 @@ const transliterateToBaybayin = (word) => {
 
               <AnimatePresence>
                 {showTrivia && (
-                  <motion.div
-                    className="trivia-container"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                  >
+                  <motion.div className="trivia-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                     {!quizFinished ? (
                       <>
                         <h4>{currentTrivia.q}</h4>
@@ -309,25 +276,32 @@ const transliterateToBaybayin = (word) => {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* === Full History Button Below Trivia === */}
+            <div className="full-history-btn-container">
+              <button
+                className={`history-btn ${showFullHistory ? 'active' : ''}`}
+                onClick={toggleFullHistory}
+              >
+                {showFullHistory ? '▲ Hide Full Written History' : '📖 Read Full History'}
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* === FULL BAYBAYIN HISTORY SECTION === */}
+      {/* === Full Baybayin History Section === */}
       <AnimatePresence>
         {showFullHistory && (
           <motion.div
             className="baybayin-history section-content"
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
-            transition={{ duration: 0.4 }}
+            exit={{ opacity: 0, y: 60 }}
+            transition={{ duration: 0.5 }}
           >
             <h3 className="section-title">What Is Baybayin?</h3>
-            <p>
-              Baybayin is a script that predated the Spanish colonization of the Philippines in 1565. 
-              The name "Baybayin" comes from the Tagalog root word "baybay" which means "to spell."
-            </p>
+            <p>Baybayin is a script that predated the Spanish colonization of the Philippines in 1565...</p>
 
           <div className="history-main-content">
             <img 
@@ -423,9 +397,26 @@ const transliterateToBaybayin = (word) => {
         <h3>Learn More About Your Filipino Heritage</h3>
           <p>Now you can begin researching your Filipino family and heritage using the FamilySearch Philippines page. Here you can use the Baybayin names translator to write your surname in Baybayin and download and print a name sheet for your family history files.</p>
           <p>Thank you for reading! I hope you learn a lot!</p>
+
+            {/* === Close Button === */}
+            <button
+              className="close-full-history-btn"
+              onClick={() => setShowFullHistory(false)}
+              style={{
+                marginTop: "2rem",
+                padding: "10px 20px",
+                backgroundColor: "#8B4513",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer"
+              }}
+            >
+              Close Full History
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
-   </div>
+    </div>
   );
 }

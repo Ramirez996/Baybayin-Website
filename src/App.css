@@ -954,3 +954,63 @@ main {
   transform: scale(1.2); /* zoom in slightly to remove white edges */
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 600px;
+  width: 90%;
+  text-align: left;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.see-more-btn, .close-modal-btn {
+  background-color: #ffcc33;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  margin-top: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.close-modal-btn {
+  background: #d9534f;
+  color: white;
+}
+
+.see-more-btn:hover {
+  background-color: #ffb300;
+}
+.close-modal-btn:hover {
+  background: #c9302c;
+}
+
+.full-history-btn-container {
+  margin-top: 2rem; /* Adds space above the Read Full History button */
+  margin-bottom: 1rem; /* Optional: adds space below it */
+  display: flex;
+  justify-content: center;
+}
+
+.full-history-btn-container .history-btn {
+  width: 80%;
+  background: linear-gradient(to right, #f3d2a2, #e2b875);
+  color: #000;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 12px 0;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
+}
+

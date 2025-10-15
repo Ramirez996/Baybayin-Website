@@ -251,3 +251,168 @@
   transition: width 0.1s linear;
 }
 
+.termsContainer {
+  margin-top: 12px;
+  text-align: left;
+  padding-left: 5px;
+}
+
+.termsLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #444;
+}
+
+.termsLabel input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #d9534f; /* your theme red */
+  margin-top: 2px;
+}
+
+.termsLabel a {
+  color: #d9534f;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.termsLabel a:hover {
+  text-decoration: underline;
+}
+
+.google-btn {
+  margin-top: 10px;
+}
+
+.divider span {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+/* Terms modal */
+.termsModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.termsBox {
+  background: #fff;
+  width: 90%;
+  max-width: 550px;
+  border-radius: 16px;
+  padding: 50px 40px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.4s ease;
+}
+
+.termsBox h2 {
+  margin-bottom: 12px;
+  color: #d9534f;
+}
+
+.termsContent {
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 10px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 25px;
+  background: #fafafa;
+}
+
+.termsContent p,
+.termsContent li {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.termsActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.agree-btn,
+.close-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.close-btn {
+  background: #ddd;
+  color: #333;
+}
+
+.agree-btn {
+  background: #d9534f;
+  color: white;
+}
+
+.agree-btn:disabled {
+  background: #bbb;
+  cursor: not-allowed;
+}
+
+.termsHint {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 5px;
+  text-align: left;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Red warning message under checkbox */
+.termsWarning {
+  color: #d9534f;
+  font-size: 0.85rem;
+  margin-top: 5px;
+  text-align: left;
+  animation: fadeIn 0.4s ease-in;
+}
+
+/* Shake animation when clicking login without agreeing */
+.shake {
+  animation: shakeAnim 0.4s ease-in-out;
+}
+
+@keyframes shakeAnim {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+
+/* Scroll progress bar at top of terms modal */
+.scrollProgressBar {
+  height: 5px;
+  background: linear-gradient(90deg, #d9534f, #ff7675);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: width 0.2s ease;
+}

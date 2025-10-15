@@ -17,10 +17,18 @@ export default function LoginSignup({ onLogin }) {
   const [success, setSuccess] = useState(false);
   const [userName, setUserName] = useState("");
   const [progress, setProgress] = useState(0);
+  const [agreed, setAgreed] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [scrolledToBottom, setScrolledToBottom] = useState(false);
 
-  // 🔹 Google Sign-In
+  // Google sign-in
   const handleGoogleSignIn = async () => {
     try {
+      if (!agreed) {
+        alert("Please agree to the Terms and Conditions first.");
+        return;
+      }
+
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
@@ -31,9 +39,15 @@ export default function LoginSignup({ onLogin }) {
     }
   };
 
-  // 🔹 Email/Password Authentication
+  // Email/password auth
   const handleAuth = async (e) => {
     e.preventDefault();
+
+    if (!agreed) {
+      alert("Please agree to the Terms and Conditions first.");
+      return;
+    }
+
     try {
       if (isLogin) {
         const userCredential = await signInWithEmailAndPassword(
@@ -46,9 +60,7 @@ export default function LoginSignup({ onLogin }) {
           setUserName(userCredential.user.email);
           setSuccess(true);
         } else {
-          alert(
-            "Please verify your email first before logging in. Check your inbox!"
-          );
+          alert("Please verify your email first before logging in.");
         }
       } else {
         const userCredential = await createUserWithEmailAndPassword(
@@ -58,9 +70,7 @@ export default function LoginSignup({ onLogin }) {
         );
 
         await sendEmailVerification(userCredential.user);
-        alert(
-          "Account created! A verification email has been sent. Please verify before logging in."
-        );
+        alert("Account created! Please verify your email before logging in.");
         auth.signOut();
       }
     } catch (error) {
@@ -68,12 +78,12 @@ export default function LoginSignup({ onLogin }) {
     }
   };
 
-  // 🔹 Progress bar countdown effect
+  // Progress animation after success
   useEffect(() => {
     if (success) {
       let timer = 0;
       const interval = setInterval(() => {
-        timer += 100; // every 100ms
+        timer += 100;
         setProgress((timer / 3500) * 100);
         if (timer >= 3500) {
           clearInterval(interval);
@@ -83,6 +93,14 @@ export default function LoginSignup({ onLogin }) {
       return () => clearInterval(interval);
     }
   }, [success, userName, email, onLogin]);
+
+  // Handle scroll detection for Terms modal
+  const handleScroll = (e) => {
+    const el = e.target;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
+      setScrolledToBottom(true);
+    }
+  };
 
   return (
     <div className="login-container">
@@ -115,7 +133,38 @@ export default function LoginSignup({ onLogin }) {
                 required
               />
 
-              <button type="submit">{isLogin ? "Login" : "Sign Up"}</button>
+              {/* Terms checkbox */}
+              <div className="termsContainer">
+                <label className="termsLabel">
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    disabled={!scrolledToBottom}
+                  />
+                  <span>
+                    I have read and agree to the{" "}
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowTerms(true);
+                      }}
+                    >
+                      Terms and Conditions
+                    </a>
+                  </span>
+                </label>
+                {!scrolledToBottom && (
+                  <p className="termsHint">
+                    *You must read all Terms & Conditions before agreeing.
+                  </p>
+                )}
+              </div>
+
+              <button type="submit" disabled={!agreed}>
+                {isLogin ? "Login" : "Sign Up"}
+              </button>
             </form>
 
             <div className="divider">
@@ -154,7 +203,7 @@ export default function LoginSignup({ onLogin }) {
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 1.2, ease: "easeOut" }}
           >
-            <div className="success-icon">Success!!</div>
+            <div className="success-icon">Login Success!</div>
             <h2>Welcome, {userName.split("@")[0]}!</h2>
             <p>You’ve successfully logged in!</p>
 
@@ -170,6 +219,64 @@ export default function LoginSignup({ onLogin }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ✅ Terms & Conditions Modal */}
+      {showTerms && (
+        <div className="termsModal">
+          <div className="termsBox">
+            <h2>Terms and Conditions</h2>
+            <div className="termsContent" onScroll={handleScroll}>
+              <p>
+               <strong> Welcome to our platform. By creating an account, you agree to the following: </strong>
+              </p>
+              <ul>
+                <li>
+                  1. Privacy Policy: Your personal data will be handled securely
+                  and used only for academic and project purposes.
+                </li>
+                <li>
+                  2. Confidentiality: We do not share your responses or results
+                  with third parties without consent.
+                </li>
+                <li>
+                  3. Dsiclaimer: This website's translation may not be completely accurate, especially for non-Tagalog words, and that users should not rely on it for permanent use like tattoos.
+                </li>
+                <li>
+                  4. User Conduct: You agree not to misuse, copy, or distribute system
+                  materials without authorization.
+                </li>
+                <li>
+                  5. Updates: Terms may be updated periodically; continued use implies acceptance.
+                </li>
+              </ul>
+
+              <p>
+               <strong> By clicking “I Agree,” you acknowledge that you have read, understood, and agree to
+                these terms.</strong>
+              </p>
+            </div>
+
+            <div className="termsActions">
+              <button
+                className="close-btn"
+                onClick={() => setShowTerms(false)}
+              >
+                Close
+              </button>
+              <button
+                className="agree-btn"
+                disabled={!scrolledToBottom}
+                onClick={() => {
+                  setAgreed(true);
+                  setShowTerms(false);
+                }}
+              >
+                I Agree
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
